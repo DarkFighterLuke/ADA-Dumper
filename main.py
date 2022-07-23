@@ -78,6 +78,7 @@ def main():
     driver = webdriver.Chrome(options=options)
 
     # Clear unfinished downloads
+    print('Cleaning unfinished downloads files...')
     delete_unfinished_downloads(save_path)
     
     # TODO: Pass conf path as argument
@@ -86,7 +87,10 @@ def main():
     login(driver, conf['username'], conf['password'])
 
     subjectsPages = get_subjectsPages(driver)
-    print(subjectsPages)
+    print('Found subjects:')
+    for subject in subjectsPages:
+        print(f'\t{subject}')
+    print()
     download_resources(driver, subjectsPages, save_path)
        
     
