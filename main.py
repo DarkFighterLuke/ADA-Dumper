@@ -8,6 +8,12 @@ def read_conf(path_to_conf : str):
     with open(path_to_conf) as f:
         return yaml.load(f, Loader=yaml.FullLoader)
 
+def delete_unfinished_downloads(save_path : str):
+    for (dirpath, _, filenames) in os.walk(save_path):
+        for filename in filenames:
+            if '.crdownload' in filename:
+                os.remove(dirpath+'/'+filename)
+
 def login(driver, username, password):
     driver.get('https://elearning.di.uniba.it/login')
     txtUsername = driver.find_element(By.ID, 'username')
@@ -70,6 +76,9 @@ def main():
             }
     options.add_experimental_option('prefs', preferences)
     driver = webdriver.Chrome(options=options)
+
+    # Clear unfinished downloads
+    delete_unfinished_downloads(save_path)
     
     # TODO: Pass conf path as argument
     conf = read_conf('conf.yml')
