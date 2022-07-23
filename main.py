@@ -1,7 +1,8 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import yaml
+import os
+import time
 
 def read_conf(path_to_conf : str):
     with open(path_to_conf) as f:
@@ -32,6 +33,14 @@ def get_unique_hrefs(resources):
         hrefs.append(resource.get_attribute('href'))
     return list(dict.fromkeys(hrefs))
 
+def are_all_downloads_completed(save_path):
+    for (_, _, filenames) in os.walk(save_path):
+        for filename in filenames:
+            if '.crdownload' in filename:
+                return False
+
+    return True
+
 def download_resources(driver, subjectsPages, save_path):
     for name in subjectsPages.keys():
         print(f'\nDumping subject: {name}...')
@@ -47,6 +56,9 @@ def download_resources(driver, subjectsPages, save_path):
                 driver.get(href)
             except:
                 print(f'\tCould not download resource {href}')
+        
+    while not are_all_downloads_completed(save_path):
+        time.sleep(2)
 
 def main():
     options = webdriver.ChromeOptions()
