@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 import yaml
 import os
 import time
+import argparse
+import sys
 
 def read_conf(path_to_conf : str):
     with open(path_to_conf) as f:
@@ -67,11 +69,17 @@ def download_resources(driver, subjectsPages, save_path):
         time.sleep(2)
 
 def main():
+    arg_parser = argparse.ArgumentParser(description='A Python script to dump resources from ADA e-learning platform @ DIB UniBa.')
+    arg_parser.add_argument('-d', '--save-path', type=str, dest='save_path', help='Base path to save dumped resources')
+    arg_parser.add_argument('-c', '--conf-path', type=str, dest='conf_path', help='Configuration file')
+    args = arg_parser.parse_args(sys.argv[1:])
+
+    if args.save_path is None:
+        args.save_path = os.getcwd()
+
     options = webdriver.ChromeOptions()
-    # TODO: Pass save path as argument
-    save_path = os.getcwd()
     preferences = {
-            "download.default_directory": save_path,
+            "download.default_directory": args.save_path,
             "plugins.always_open_pdf_externally": True,
             }
     options.add_experimental_option('prefs', preferences)
@@ -79,10 +87,12 @@ def main():
 
     # Clear unfinished downloads
     print('Cleaning unfinished downloads files...')
-    delete_unfinished_downloads(save_path)
+    delete_unfinished_downloads(args.save_path)
     
     # TODO: Pass conf path as argument
-    conf = read_conf('conf.yml')
+    if args.conf_path is None:
+        args.conf_path = 'conf.yml'
+    conf = read_conf(args.conf_path)
 
     login(driver, conf['username'], conf['password'])
 
@@ -91,7 +101,7 @@ def main():
     for subject in subjectsPages:
         print(f'\t{subject}')
     print()
-    download_resources(driver, subjectsPages, save_path)
+    download_resources(driver, subjectsPages, args.save_path)
        
     
 if __name__ == '__main__':
