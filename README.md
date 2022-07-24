@@ -1,5 +1,5 @@
 # ADA-Dumper
-Python script to dump courses resources from ADA e-learning platform @ DIB UniBa
+A Python script to dump courses resources from ADA e-learning platform @ DIB UniBa.
 
 ## Usage
 ```
